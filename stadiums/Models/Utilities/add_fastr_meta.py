@@ -63,7 +63,8 @@ def add_fastr_meta(stadium_collection):
     ).reset_index()
     ## calculate team X stadium data points ##
     games['home_team_stadium'] = numpy.where(
-        ~numpy.isin(games['stadium_id'], neutral_sites),
+        (~numpy.isin(games['stadium_id'], neutral_sites)) &
+        (games['location'] == 'Home'),
         games['home_team'],
         numpy.nan
     )
@@ -71,26 +72,22 @@ def add_fastr_meta(stadium_collection):
         games_played=('game_id', 'count'),
         last_game_date=('gameday', 'max')
     ).reset_index()
-    ## for each stadium select the team with the most games played ##
-    teams = teams.sort_values(
+    ## for each stadium select the team with the most games played and set as primary team ##
+    primary = teams.sort_values(
         by=['stadium_id', 'games_played'],
         ascending=[True, False]
     ).groupby('stadium_id').head(1)
-    ## then sort by last stadium the team played in ##
-    teams = teams.sort_values(
+    ## for each team, select the stadium with the most recent game as the current stadium ##
+    current = teams.sort_values(
         by=['home_team_stadium', 'last_game_date'],
-        ascending=[True, True]
-    ).reset_index(drop=True)
-    ## if the stadium is the last rec for the team, set is_current to True ##
-    teams['is_current'] = numpy.where(
-        teams['last_game_date'] == teams.groupby('home_team_stadium')['last_game_date'].transform('max'),
-        True,
-        False
-    )
-    ## merge ##
+        ascending=[True, False]
+    ).groupby('home_team_stadium').head(1)
+    current['is_current'] = True
+    ## merge data points ##
+    ## primary team ##
     meta_final = pd.merge(
         general_meta,
-        teams[['stadium_id', 'home_team_stadium', 'is_current']].rename(
+        primary[['stadium_id', 'home_team_stadium']].rename(
             columns={
                 'home_team_stadium': 'primary_team'
             }
@@ -98,6 +95,19 @@ def add_fastr_meta(stadium_collection):
         on='stadium_id',
         how='left'
     )
+    ## is_current ##
+    meta_final = pd.merge(
+        meta_final,
+        current[['stadium_id', 'home_team_stadium', 'is_current']].rename(
+            columns={
+                'home_team_stadium': 'primary_team'
+            }
+        ),
+        on=['stadium_id', 'primary_team'],
+        how='left'
+    )
+    ## fill is_current nas with false ##
+    meta_final['is_current'] = meta_final['is_current'].fillna(False)
     ## create a map of stadium ids and their meta for faster lookups ##
     meta_map = meta_final.set_index('stadium_id').to_dict(orient='index')
     ## add the meta to the stadium collection ##
