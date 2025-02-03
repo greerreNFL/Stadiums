@@ -1,9 +1,9 @@
 ## external ##
 import pandas as pd
 import numpy as numpy
-import nfelodcm as dcm
 
 ## local ##
+from ...DataLoader import data
 ## from ..StadiumCollection import StadiumCollection
 ## Note, since StadiumCollection imports this utility, it cant be imported
 ## here for typing purposes
@@ -49,8 +49,7 @@ def add_fastr_meta(stadium_collection):
     * None
     '''
     ## load the games ##
-    db = dcm.load(['games'])
-    games = db['games']
+    games = data.db['games'].copy()
     ## map types ##
     games['surface_type'] = games['surface'].map(field_map).fillna('Turf')
     games['roof_type'] = games['roof'].map(roof_map).fillna('Outdoors')
