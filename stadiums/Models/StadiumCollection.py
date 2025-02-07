@@ -19,8 +19,7 @@ class StadiumCollection:
         self.stadium_properties: List[str] = [
             'stadium_id', 'stadium_name',
             'lat', 'lon', 'altitude', 'heading',
-            'primary_team', 'is_current', 'first_game_date',
-            'last_game_date', 'surface_type',
+            'first_game_date', 'last_game_date', 'surface_type',
             'address', 'city', 'state', 'zipcode', 'country',
             'tz', 'tz_offset', 'wikipedia_url', 'img_sat_url',
             'img_logo_url', 'img_shot_url', 'website', 'nicknames',

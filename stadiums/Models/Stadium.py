@@ -18,8 +18,6 @@ class Stadium:
     lon: Optional[float] = field(default=None)
     altitude: Optional[float] = field(default=None)
     heading: Optional[int] = field(default=None)
-    primary_team: Optional[str] = field(default=None)
-    is_current: Optional[bool] = field(default=None)
     first_game_date: Optional[str] = field(default=None)
     last_game_date: Optional[str] = field(default=None)
     surface_type: Optional[str] = field(default=None)

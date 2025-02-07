@@ -127,3 +127,5 @@ def calc_analytics():
     ## save ##
     team_hfa.to_csv('{0}/rolling_team_hfa.csv'.format(output_loc), index=False)
     league_hfa.to_csv('{0}/rolling_league_hfa.csv'.format(output_loc), index=False)
+    ## return ##
+    return team_hfa, league_hfa

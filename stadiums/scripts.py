@@ -8,7 +8,8 @@ import pandas as pd
 ## local ##
 from .DataLoader import data
 from .Models import StadiumCollection
-from .Analytics import calc_analytics
+from .Analytics import calc_analytics, gen_team_stadiums
+
 def update_stadiums(
     force_rescrape: bool = False,
     force_reparse: bool = False
@@ -52,4 +53,7 @@ def update_stadiums(
     ## save the stadium collection ##
     stadium_collection.to_csv(stadium_loc)
     ## calculate analytics ##
-    calc_analytics()
+    team_hfa, league_hfa = calc_analytics()
+    ## generate team stadiums ##
+    combos = gen_team_stadiums(stadium_collection, team_hfa)
+    

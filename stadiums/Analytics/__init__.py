@@ -1,1 +1,2 @@
 from .calc_analytics import calc_analytics
+from .gen_team_stadiums import gen_team_stadiums

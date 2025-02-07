@@ -60,57 +60,10 @@ def add_fastr_meta(stadium_collection):
         surface_type=('surface_type', 'last'),
         roof_type=('roof_type', 'last')
     ).reset_index()
-    ## calculate team X stadium data points ##
-    games['home_team_stadium'] = numpy.where(
-        (~numpy.isin(games['stadium_id'], neutral_sites)) &
-        (games['location'] == 'Home'),
-        games['home_team'],
-        numpy.nan
-    )
-    teams = games.groupby(['stadium_id', 'home_team_stadium']).agg(
-        games_played=('game_id', 'count'),
-        last_game_date=('gameday', 'max')
-    ).reset_index()
-    ## for each stadium select the team with the most games played and set as primary team ##
-    primary = teams.sort_values(
-        by=['stadium_id', 'games_played'],
-        ascending=[True, False]
-    ).groupby('stadium_id').head(1)
-    ## for each team, select the stadium with the most recent game as the current stadium ##
-    current = teams.sort_values(
-        by=['home_team_stadium', 'last_game_date'],
-        ascending=[True, False]
-    ).groupby('home_team_stadium').head(1)
-    current['is_current'] = True
-    ## merge data points ##
-    ## primary team ##
-    meta_final = pd.merge(
-        general_meta,
-        primary[['stadium_id', 'home_team_stadium']].rename(
-            columns={
-                'home_team_stadium': 'primary_team'
-            }
-        ),
-        on='stadium_id',
-        how='left'
-    )
-    ## is_current ##
-    meta_final = pd.merge(
-        meta_final,
-        current[['stadium_id', 'home_team_stadium', 'is_current']].rename(
-            columns={
-                'home_team_stadium': 'primary_team'
-            }
-        ),
-        on=['stadium_id', 'primary_team'],
-        how='left'
-    )
-    ## fill is_current nas with false ##
-    meta_final['is_current'] = meta_final['is_current'].fillna(False)
     ## create a map of stadium ids and their meta for faster lookups ##
-    meta_map = meta_final.set_index('stadium_id').to_dict(orient='index')
+    meta_map = general_meta.set_index('stadium_id').to_dict(orient='index')
     ## add the meta to the stadium collection ##
     for stadium_id, stadium in stadium_collection.stadiums.items():
         ## add the meta ##
-        for field in ['first_game_date', 'last_game_date', 'surface_type', 'roof_type', 'primary_team', 'is_current']:
+        for field in ['first_game_date', 'last_game_date', 'surface_type', 'roof_type']:
             setattr(stadium, field, meta_map[stadium_id][field])
