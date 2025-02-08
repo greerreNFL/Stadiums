@@ -15,6 +15,8 @@ __pycache__
 
 # cache created by user ##
 *.txt
+# but not the requirements file in the root directory
+!requirements.txt
 
 # logs ##
 */Logs/*

@@ -2,7 +2,6 @@
 from dataclasses import dataclass, field, asdict
 from typing import Optional
 import pathlib
-import os
 
 ## external imports ##
 import pandas as pd
