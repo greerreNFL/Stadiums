@@ -1,6 +1,6 @@
 numpy
 pandas
-nflelodcm
+nfelodcm
 beautifulsoup4
 requests
 
