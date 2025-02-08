@@ -1,0 +1,6 @@
+numpy
+pandas
+nflelodcm
+beautifulsoup4
+requests
+
